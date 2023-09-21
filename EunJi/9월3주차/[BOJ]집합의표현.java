@@ -1,15 +1,18 @@
-// 시간초과...
-
 import java.io.*;
 import java.util.*;
 
 public class Main {
 
-    public static void union(int[] root, int a, int b, int n) {
-        root[Math.max(a, b)] = Math.min(a, b);
-        for (int i = 0; i < n + 1; i++) {
-            if (root[i] == Math.max(a, b)) root[i] = Math.min(a, b);
-        }
+    public static void union(int[] parent, int a, int b) {
+        a = find(parent, a);
+        b = find(parent, b);
+        if (a < b) parent[b] = a;
+        else parent[a] = b;
+    }
+
+    public static int find (int[] parent, int x) {
+        if (parent[x] == x) return x;
+        else return parent[x] = find(parent, parent[x]); // 부모노드 대신 루트노드로 재설정 <- 해줘야 시간초과 안남
     }
 
     public static void main(String[] args) throws Exception {
@@ -21,9 +24,9 @@ public class Main {
         int n = Integer.parseInt(st.nextToken()); // 초기 집합: {0}, {1}, {2}, ... , {n}
         int m = Integer.parseInt(st.nextToken()); // 연산 개수
 
-        // 루트노드 초기화
-        int[] root = new int[n + 1];
-        for (int i = 0; i < n + 1; i++) root[i] = i;
+        // 부모노드 초기화
+        int[] parent = new int[n + 1];
+        for (int i = 0; i < n + 1; i++) parent[i] = i;
 
         // m개의 연산
         for (int i = 0; i < m; i++) {
@@ -33,9 +36,9 @@ public class Main {
             int b = Integer.parseInt(st.nextToken()); // b 집합
 
             if (od == 0) { // 합집합
-                union(root, a, b, n);
+                union(parent, a, b);
             } else if (od == 1) { // 같은 집합에 포함 되어 있는지 확인
-                bw.write(root[a] == root[b] ? "YES\n" : "NO\n");
+                bw.write(find(parent, a) == find(parent, b) ? "YES\n" : "NO\n");
             }
         }
         bw.close();
